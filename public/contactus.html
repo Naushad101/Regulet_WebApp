@@ -1,0 +1,1292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Regulet</title>
+  <link rel="icon" type="image/png" href="regula_icon.png" />
+  <link rel="shortcut icon" type="image/png" href="regula_icon.png" />
+  <link rel="apple-touch-icon" href="regula_icon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=DM+Serif+Display&display=swap" rel="stylesheet">
+ 
+  <!-- reCAPTCHA v2 Script -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+ 
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'DM Sans', Arial, sans-serif; background: #f5f7fb; color: #333; font-size: 15px; }
+ 
+    /* HEADER */
+    header {
+      background: #fff;
+      border-bottom: 1px solid #e0e0e0;
+      padding: 14px 32px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    header img { width: 36px; height: 36px; object-fit: contain; }
+    header .brand-name { font-size: 1.1rem; font-weight: 700; color: #1a1a1a; }
+    header .brand-tagline { font-size: 0.72rem; color: #888; margin-top: 1px; }
+ 
+    /* PAGE TITLE */
+    .page-title {
+      background: linear-gradient(135deg, #1a3a5c 0%, #1a5276 60%, #2471a3 100%);
+      padding: 40px 32px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .page-title::before {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 220px; height: 220px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -60px; left: 10%;
+      width: 160px; height: 160px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .page-title h1 { font-size: 1.8rem; font-weight: 700; color: #fff; margin-bottom: 6px; letter-spacing: -0.3px; }
+    .page-title p  { font-size: 0.9rem; color: rgba(255,255,255,0.75); }
+ 
+    /* TABS */
+    .tab-bar {
+      display: flex;
+      border-bottom: 2px solid #e0e0e0;
+      max-width: 860px;
+      margin: 28px auto 0;
+      padding: 0 16px;
+      background: transparent;
+    }
+    .tab-btn {
+      padding: 10px 28px;
+      border: none;
+      background: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #888;
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+      transition: all 0.2s;
+      font-family: 'DM Sans', Arial, sans-serif;
+    }
+    .tab-btn:hover { color: #1a1a1a; }
+    .tab-btn.active { color: #1a5276; border-bottom-color: #1a5276; }
+ 
+    /* CONTENT */
+    .wrap { max-width: 860px; margin: 0 auto; padding: 28px 16px 60px; }
+    .section { display: none; }
+    .section.active { display: block; }
+ 
+    /* INFO CARDS */
+    .info-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+    .info-box {
+      border-radius: 14px;
+      padding: 22px 20px 20px;
+      background: #fff;
+      box-shadow: 0 2px 12px rgba(26,82,118,0.08);
+      border: 1px solid rgba(26,82,118,0.07);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .info-box::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #1a5276, #2e86c1);
+      border-radius: 14px 14px 0 0;
+    }
+    .info-box:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(26,82,118,0.13); }
+    .info-box .icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #eaf1f8, #d6e9f5);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 14px;
+      font-size: 1.1rem;
+    }
+    .info-box .lbl {
+      font-size: 0.68rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.09em;
+      color: #2e86c1; margin-bottom: 8px;
+    }
+    .info-box .val { font-size: 0.88rem; color: #444; line-height: 1.7; }
+    .info-box a { color: #1a5276; text-decoration: none; font-weight: 500; }
+    .info-box a:hover { text-decoration: underline; }
+ 
+    /* FORM */
+    .form-section-title {
+      font-size: 1.05rem; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 1px solid #ececec;
+    }
+    .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width: 520px) { .form-row-2 { grid-template-columns: 1fr; } }
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 0.82rem; font-weight: 600; color: #444; margin-bottom: 5px;
+    }
+    .field label .req { color: #e74c3c; font-size: 0.75rem; }
+ 
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 10px 14px;
+      border: 1.5px solid #dde3ea; border-radius: 8px;
+      font-size: 0.9rem; font-family: 'DM Sans', Arial, sans-serif;
+      color: #333; outline: none; background: #fff;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus, .field select:focus, .field textarea:focus {
+      border-color: #1a5276;
+      box-shadow: 0 0 0 3px rgba(26,82,118,0.08);
+    }
+    .field input.error, .field textarea.error {
+      border-color: #e74c3c;
+      box-shadow: 0 0 0 3px rgba(231,76,60,0.08);
+    }
+    .field input.valid, .field textarea.valid {
+      border-color: #1a8a5a;
+      box-shadow: 0 0 0 3px rgba(26,138,90,0.07);
+    }
+ 
+    .input-wrapper { position: relative; }
+    .input-wrapper input { padding-right: 36px; }
+    .input-icon {
+      position: absolute; right: 12px; top: 50%;
+      transform: translateY(-50%);
+      font-size: 0.85rem; pointer-events: none;
+      opacity: 0; transition: opacity 0.2s;
+    }
+    .input-icon.show { opacity: 1; }
+    .input-icon.ok  { color: #1a8a5a; }
+    .input-icon.bad { color: #e74c3c; }
+ 
+    .field .error-msg {
+      font-size: 0.75rem; color: #e74c3c;
+      margin-top: 5px; display: none;
+      align-items: center; gap: 4px;
+      animation: fadeIn 0.2s ease;
+    }
+    .field .error-msg.visible { display: flex; }
+    .field .hint { font-size: 0.73rem; color: #999; margin-top: 4px; }
+ 
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-3px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+ 
+    .field textarea { resize: vertical; }
+ 
+    .char-count { font-size: 0.72rem; color: #aaa; text-align: right; margin-top: 3px; transition: color 0.2s; }
+    .char-count.warn  { color: #e67e22; }
+    .char-count.limit { color: #e74c3c; }
+ 
+    /* CAPTCHA */
+    .captcha-wrap { margin-bottom: 18px; }
+    .captcha-error {
+      font-size: 0.75rem; color: #e74c3c;
+      margin-top: 7px; display: none;
+      align-items: center; gap: 4px;
+      animation: fadeIn 0.2s ease;
+    }
+    .captcha-error.visible { display: flex; }
+ 
+    /* BUTTON */
+    .btn {
+      background: linear-gradient(135deg, #1a5276, #2471a3);
+      color: #fff; border: none; padding: 11px 30px;
+      border-radius: 8px; font-size: 0.9rem;
+      font-weight: 600; cursor: pointer;
+      font-family: 'DM Sans', Arial, sans-serif;
+      transition: opacity 0.2s, transform 0.15s;
+      letter-spacing: 0.02em;
+      display: inline-flex; align-items: center; gap: 8px;
+      min-width: 110px; justify-content: center;
+    }
+    .btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+    .btn:disabled { opacity: 0.65; cursor: not-allowed; transform: none; }
+ 
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.4);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .btn.loading .spinner  { display: inline-block; }
+    .btn.loading .btn-text { display: none; }
+ 
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 28px; left: 50%;
+      transform: translateX(-50%) translateY(80px);
+      padding: 13px 22px; border-radius: 10px;
+      font-size: 0.88rem; font-weight: 600; color: #fff;
+      z-index: 9999; display: flex; align-items: center; gap: 10px;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.15);
+      opacity: 0;
+      transition: transform 0.35s cubic-bezier(0.34,1.56,0.64,1), opacity 0.35s ease;
+      pointer-events: none; white-space: nowrap;
+    }
+    .toast.success { background: #1a8a5a; }
+    .toast.error   { background: #c0392b; }
+    .toast.show    { transform: translateX(-50%) translateY(0); opacity: 1; }
+ 
+    /* PRIVACY */
+    .policy-meta {
+      background: #fff; border-radius: 12px;
+      padding: 18px 22px; margin-bottom: 24px;
+      border: 1px solid #e8eef5;
+      box-shadow: 0 2px 8px rgba(26,82,118,0.06);
+    }
+    .policy-meta table { border-collapse: collapse; width: auto; }
+    .policy-meta td { font-size: 0.85rem; padding: 3px 12px 3px 0; color: #555; line-height: 1.6; }
+    .policy-meta td:first-child { font-weight: 600; color: #1a5276; white-space: nowrap; }
+    .policy-block { padding: 18px 0; border-bottom: 1px solid #f0f0f0; }
+    .policy-block:last-of-type { border-bottom: none; }
+    .policy-block h3 { font-size: 0.97rem; font-weight: 700; color: #1a1a1a; margin-bottom: 8px; }
+    .policy-block h4 { font-size: 0.88rem; font-weight: 700; color: #1a5276; margin: 12px 0 6px; }
+    .policy-block p  { font-size: 0.88rem; color: #555; line-height: 1.85; margin-bottom: 6px; }
+    .policy-block ul { padding-left: 20px; margin-bottom: 6px; }
+    .policy-block ul li { font-size: 0.88rem; color: #555; line-height: 1.85; }
+    .policy-block strong { color: #1a1a1a; }
+    .policy-note {
+      margin-top: 20px; padding: 14px 18px;
+      background: #eaf1f8; border-left: 4px solid #1a5276;
+      border-radius: 0 5px 5px 0; font-size: 0.88rem; color: #444; line-height: 1.7;
+    }
+    .policy-note a { color: #1a5276; }
+
+    /* ═══════════════════════ ABOUT US STYLES ═══════════════════════ */
+    .about-hero {
+      background: linear-gradient(135deg, #1a3a5c 0%, #1a5276 60%, #2471a3 100%);
+      border-radius: 16px;
+      padding: 36px 32px;
+      margin-bottom: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+    .about-hero::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 180px; height: 180px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.06);
+    }
+    .about-hero::after {
+      content: '';
+      position: absolute;
+      bottom: -40px; left: 5%;
+      width: 130px; height: 130px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.04);
+    }
+    .about-hero h2 {
+      font-size: 1.5rem; font-weight: 700; color: #fff;
+      margin-bottom: 12px; position: relative; z-index: 1;
+    }
+    .about-hero p {
+      font-size: 0.92rem; color: rgba(255,255,255,0.82);
+      line-height: 1.8; position: relative; z-index: 1;
+      max-width: 700px;
+    }
+
+    .about-section {
+      background: #fff;
+      border-radius: 14px;
+      padding: 28px 28px 24px;
+      margin-bottom: 20px;
+      border: 1px solid rgba(26,82,118,0.07);
+      box-shadow: 0 2px 12px rgba(26,82,118,0.07);
+      position: relative;
+      overflow: hidden;
+    }
+    .about-section::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #1a5276, #2e86c1);
+      border-radius: 14px 14px 0 0;
+    }
+    .about-section h3 {
+      font-size: 1.05rem; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 14px; padding-bottom: 12px;
+      border-bottom: 1px solid #ececec;
+      display: flex; align-items: center; gap: 10px;
+    }
+    .about-section h3 .section-icon {
+      width: 32px; height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #eaf1f8, #d6e9f5);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.95rem; flex-shrink: 0;
+    }
+    .about-section p {
+      font-size: 0.88rem; color: #555; line-height: 1.85; margin-bottom: 10px;
+    }
+    .about-section p:last-child { margin-bottom: 0; }
+    .about-section ul {
+      padding-left: 0; list-style: none; margin-bottom: 10px;
+    }
+    .about-section ul li {
+      font-size: 0.88rem; color: #555; line-height: 1.85;
+      padding: 4px 0 4px 20px; position: relative;
+    }
+    .about-section ul li::before {
+      content: '▸';
+      position: absolute; left: 0;
+      color: #2e86c1; font-size: 0.75rem; top: 6px;
+    }
+    .about-section strong { color: #1a3a5c; }
+
+    .about-subsection {
+      margin-top: 16px; padding-top: 16px;
+      border-top: 1px dashed #e8eef5;
+    }
+    .about-subsection h4 {
+      font-size: 0.92rem; font-weight: 700; color: #1a5276;
+      margin-bottom: 10px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+    .feature-card {
+      background: #fff;
+      border-radius: 14px;
+      padding: 22px 20px;
+      border: 1px solid rgba(26,82,118,0.07);
+      box-shadow: 0 2px 10px rgba(26,82,118,0.07);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+      position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #1a5276, #2e86c1);
+      border-radius: 14px 14px 0 0;
+    }
+    .feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(26,82,118,0.13); }
+    .feature-card .fc-icon {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #eaf1f8, #d6e9f5);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 12px; font-size: 1.1rem;
+    }
+    .feature-card h4 {
+      font-size: 0.9rem; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+    .feature-card p {
+      font-size: 0.82rem; color: #666; line-height: 1.7;
+    }
+    .feature-card ul {
+      padding-left: 0; list-style: none; margin-top: 8px;
+    }
+    .feature-card ul li {
+      font-size: 0.82rem; color: #666; line-height: 1.7;
+      padding-left: 14px; position: relative;
+    }
+    .feature-card ul li::before {
+      content: '•'; position: absolute; left: 0;
+      color: #2e86c1;
+    }
+
+    .arch-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+      margin-top: 16px;
+    }
+    .arch-card {
+      background: #f8fbfe;
+      border-radius: 10px;
+      padding: 18px 16px;
+      border: 1px solid #dde8f3;
+    }
+    .arch-card .arch-num {
+      font-size: 0.7rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.08em;
+      color: #2e86c1; margin-bottom: 6px;
+    }
+    .arch-card h4 {
+      font-size: 0.9rem; font-weight: 700; color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+    .arch-card p {
+      font-size: 0.82rem; color: #666; line-height: 1.65; margin-bottom: 6px;
+    }
+    .arch-card ul {
+      padding-left: 0; list-style: none;
+    }
+    .arch-card ul li {
+      font-size: 0.82rem; color: #666; line-height: 1.65;
+      padding-left: 14px; position: relative;
+    }
+    .arch-card ul li::before {
+      content: '–'; position: absolute; left: 0; color: #2e86c1;
+    }
+
+    .use-cases-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 14px;
+      margin-top: 4px;
+    }
+    .use-case-card {
+      background: #f8fbfe;
+      border-radius: 12px;
+      padding: 20px 16px;
+      border: 1px solid #dde8f3;
+      text-align: center;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+    .use-case-card:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(26,82,118,0.1); }
+    .use-case-card .uc-icon { font-size: 1.6rem; margin-bottom: 10px; }
+    .use-case-card h4 { font-size: 0.88rem; font-weight: 700; color: #1a1a1a; margin-bottom: 6px; }
+    .use-case-card p  { font-size: 0.8rem; color: #666; line-height: 1.6; }
+
+    .vision-banner {
+      background: linear-gradient(135deg, #1a3a5c 0%, #1a5276 60%, #2471a3 100%);
+      border-radius: 14px;
+      padding: 28px 28px;
+      margin-top: 20px;
+      position: relative; overflow: hidden;
+    }
+    .vision-banner::before {
+      content: '';
+      position: absolute;
+      top: -20px; right: -20px;
+      width: 140px; height: 140px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.05);
+    }
+    .vision-banner h3 {
+      font-size: 1rem; font-weight: 700; color: #fff;
+      margin-bottom: 10px; position: relative; z-index: 1;
+    }
+    .vision-banner p {
+      font-size: 0.9rem; color: rgba(255,255,255,0.82);
+      line-height: 1.8; position: relative; z-index: 1;
+    }
+    .vision-banner strong { color: #fff; }
+
+    footer { text-align: center; padding: 20px; font-size: 0.78rem; color: #aaa; border-top: 1px solid #ececec; background: #fff; }
+  </style>
+</head>
+<body>
+ 
+  <header>
+    <img src="regula_icon.png" alt="Regulet" onerror="this.style.display='none'" />
+    <div>
+      <div class="brand-name">Regulet</div>
+      <div class="brand-tagline">Parental Control</div>
+    </div>
+  </header>
+ 
+  <div class="page-title">
+    <h1>Contact Us</h1>
+    <p>Get in touch with our team or review our privacy policy.</p>
+  </div>
+ 
+  <div class="tab-bar">
+    <button class="tab-btn active" id="tabBtnContact" onclick="switchTab('contact', this)">Contact</button>
+    <button class="tab-btn" id="tabBtnAbout" onclick="switchTab('about', this)">About Us</button>
+    <button class="tab-btn" id="tabBtnPrivacy" onclick="switchTab('privacy', this)">Privacy Policy</button>
+  </div>
+ 
+  <div class="wrap">
+ 
+    <!-- ═══════════════════════ CONTACT TAB ═══════════════════════ -->
+    <div id="contact" class="section active">
+ 
+      <div class="info-row">
+        <div class="info-box">
+          <div class="icon">📍</div>
+          <div class="lbl">Address</div>
+          <div class="val">BNT Soft Pvt. Ltd.<br>4th Floor, Vari Tech Centre, Rajiv Gandhi Infotech Park, Hinjawadi, Pune, Maharashtra 411057</div>
+        </div>
+        <div class="info-box">
+          <div class="icon">📞</div>
+          <div class="lbl">Phone</div>
+          <div class="val"><a href="tel:+912067960700">+9120-67960700</a></div>
+        </div>
+        <div class="info-box">
+          <div class="icon">✉️</div>
+          <div class="lbl">Email</div>
+          <div class="val"><a href="mailto:reguletsupport@bnt-soft.com">reguletsupport@bnt-soft.com</a></div>
+        </div>
+        <div class="info-box">
+          <div class="icon">🕐</div>
+          <div class="lbl">Business Hours</div>
+          <div class="val">Mon – Fri: 9 AM – 6 PM</div>
+        </div>
+      </div>
+ 
+      <div class="form-section-title">Send Us a Message</div>
+ 
+      <div class="form-row-2">
+        <div class="field">
+          <label>First Name <span class="req">*</span></label>
+          <div class="input-wrapper">
+            <input type="text" id="firstName" placeholder="John" autocomplete="given-name" />
+            <span class="input-icon" id="firstNameIcon"></span>
+          </div>
+          <div class="error-msg" id="firstNameErr">⚠ First name is required.</div>
+        </div>
+        <div class="field">
+          <label>Last Name <span class="req">*</span></label>
+          <div class="input-wrapper">
+            <input type="text" id="lastName" placeholder="Doe" autocomplete="family-name" />
+            <span class="input-icon" id="lastNameIcon"></span>
+          </div>
+          <div class="error-msg" id="lastNameErr">⚠ Last name is required.</div>
+        </div>
+      </div>
+ 
+      <div class="form-row-2">
+        <div class="field">
+          <label>Email Address <span class="req">*</span></label>
+          <div class="input-wrapper">
+            <input type="email" id="email" placeholder="example@company.com" autocomplete="email" />
+            <span class="input-icon" id="emailIcon"></span>
+          </div>
+          <div class="error-msg" id="emailErr">⚠ <span id="emailErrText">A valid email address is required.</span></div>
+          <div class="hint">e.g. name@domain.com</div>
+        </div>
+      </div>
+ 
+      <div class="field">
+        <label>Message <span class="req">*</span></label>
+        <textarea rows="4" id="message" placeholder="Briefly describe your inquiry..." maxlength="1000"></textarea>
+        <div class="char-count" id="charCount">0 / 1000</div>
+        <div class="error-msg" id="messageErr">⚠ Message is required (min 10 characters).</div>
+      </div>
+ 
+      <!-- reCAPTCHA v2 Widget -->
+      <div class="captcha-wrap">
+        <div
+          class="g-recaptcha"
+          data-sitekey="6LcKwSAsAAAAAA4BE8HT8X2lu-zkrv7AWbM0H6Ug"
+          data-theme="light"
+          data-size="normal"
+          data-callback="onCaptchaSuccess"
+          data-expired-callback="onCaptchaExpired"
+          data-error-callback="onCaptchaError">
+        </div>
+        <div class="captcha-error" id="captchaErr">⚠ Please complete the CAPTCHA verification.</div>
+      </div>
+ 
+      <button class="btn" id="submitBtn" onclick="handleSubmit()">
+        <span class="btn-text">Submit</span>
+        <span class="spinner"></span>
+      </button>
+    </div>
+
+    <!-- ═══════════════════════ ABOUT US TAB ═══════════════════════ -->
+    <div id="about" class="section">
+
+      <!-- Hero / Mission -->
+      <div class="about-hero">
+        <h2>Our Mission</h2>
+        <p>In today's hyper-connected digital world, distractions and unsafe online content can reduce productivity and impact digital wellbeing. <strong>Regulet</strong> is designed to help individuals, parents, and organizations take control of device usage through intelligent app and website management.</p>
+        <p style="margin-top:12px;">Our mission is to provide a <strong>simple, secure, and effective digital regulation platform</strong> that empowers users to manage mobile usage, reduce distractions, and maintain a healthier digital lifestyle.</p>
+      </div>
+
+      <!-- What is Regulet -->
+      <div class="about-section">
+        <h3><span class="section-icon">📱</span> What is Regulet?</h3>
+        <p>Regulet is an Android-based digital control and monitoring application that enables users to regulate mobile usage through <strong>application blocking, website blocking, and smart scheduling rules</strong>.</p>
+        <p>The platform helps users:</p>
+        <ul>
+          <li>Reduce unnecessary screen time</li>
+          <li>Block distracting apps and websites</li>
+          <li>Enforce usage policies on devices</li>
+          <li>Create focused and productive digital environments</li>
+        </ul>
+        <p>Whether it is <strong>personal productivity, parental guidance, or workplace device control</strong>, Regulet provides flexible and powerful tools to manage digital access.</p>
+      </div>
+
+      <!-- Key Features -->
+      <div class="about-section">
+        <h3><span class="section-icon">⭐</span> Key Features</h3>
+
+        <div class="features-grid">
+          <div class="feature-card">
+            <div class="fc-icon">🚫</div>
+            <h4>App Blocking</h4>
+            <p>Regulet allows users to <strong>block specific applications</strong> installed on the device.</p>
+            <ul>
+              <li>Block distracting social media or gaming apps</li>
+              <li>Create scheduled blocking rules</li>
+              <li>Temporarily restrict apps during work or study hours</li>
+              <li>Automatically enforce restrictions in the background</li>
+            </ul>
+            <p style="margin-top:8px;font-size:0.82rem;color:#555;">The app continuously monitors application usage and <strong>prevents restricted apps from launching</strong> when blocking rules are active.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="fc-icon">🌐</div>
+            <h4>Website (URL) Blocking</h4>
+            <p>Regulet provides the ability to <strong>block access to specific websites</strong> directly on the device.</p>
+            <ul>
+              <li>Block harmful or distracting websites</li>
+              <li>Restrict access to selected domains</li>
+              <li>Maintain a list of blocked URLs</li>
+              <li>Enforce safe browsing rules across the device</li>
+            </ul>
+            <p style="margin-top:8px;font-size:0.82rem;color:#555;">This ensures users remain protected from unwanted or time-wasting web content.</p>
+          </div>
+
+          <div class="feature-card">
+            <div class="fc-icon">🎯</div>
+            <h4>Focus Mode &amp; Digital Discipline</h4>
+            <p>Regulet encourages <strong>digital discipline</strong> by helping users stay focused.</p>
+            <ul>
+              <li>Prevents app usage during focus sessions</li>
+              <li>Encourages mindful technology usage</li>
+              <li>Helps build healthier digital habits</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Architecture -->
+      <div class="about-section">
+        <h3><span class="section-icon">⚙️</span> Core Architecture</h3>
+        <p>Regulet is built using a <strong>secure and efficient Android architecture</strong> designed to ensure performance, reliability, and privacy.</p>
+
+        <div class="arch-grid">
+          <div class="arch-card">
+            <div class="arch-num">Layer 1</div>
+            <h4>Device Monitoring Layer</h4>
+            <p>Uses Android system capabilities such as:</p>
+            <ul>
+              <li>Usage statistics access</li>
+              <li>Accessibility monitoring</li>
+              <li>Foreground app detection</li>
+            </ul>
+            <p style="margin-top:6px;">Continuously detects which applications are currently active on the device.</p>
+          </div>
+
+          <div class="arch-card">
+            <div class="arch-num">Layer 2</div>
+            <h4>Rule Engine</h4>
+            <p>Responsible for processing configured rules and policies. It evaluates:</p>
+            <ul>
+              <li>Blocked apps list</li>
+              <li>Blocked URL list</li>
+              <li>Scheduled rules</li>
+              <li>Time-based restrictions</li>
+            </ul>
+            <p style="margin-top:6px;">Whenever a restricted app or website is detected, the rule engine triggers the blocking mechanism.</p>
+          </div>
+
+          <div class="arch-card">
+            <div class="arch-num">Layer 3</div>
+            <h4>VPN-Based Web Filtering</h4>
+            <p>Uses a <strong>local VPN-based filtering mechanism</strong> to block websites effectively. This allows the app to:</p>
+            <ul>
+              <li>Intercept network requests locally on the device</li>
+              <li>Detect blocked domains</li>
+              <li>Prevent connections to restricted URLs</li>
+            </ul>
+            <p style="margin-top:6px;">All filtering happens <strong>locally on the device</strong>, ensuring user data privacy.</p>
+          </div>
+
+          <div class="arch-card">
+            <div class="arch-num">Layer 4</div>
+            <h4>Background Enforcement Service</h4>
+            <p>A persistent background service ensures rules remain active even when the app is not open. This service:</p>
+            <ul>
+              <li>Monitors app launches</li>
+              <li>Applies restrictions instantly</li>
+              <li>Ensures uninterrupted protection</li>
+            </ul>
+          </div>
+
+          <div class="arch-card">
+            <div class="arch-num">Layer 5</div>
+            <h4>Secure Local Data Storage</h4>
+            <p>All rules, blocked lists, and configurations are securely stored within the device.</p>
+            <p style="margin-top:6px;">Regulet prioritizes <strong>privacy and data protection</strong>, ensuring user data is never misused.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Who Can Use Regulet -->
+      <div class="about-section">
+        <h3><span class="section-icon">👥</span> Who Can Use Regulet?</h3>
+        <p>Regulet is designed for multiple use cases:</p>
+        <div class="use-cases-row">
+          <div class="use-case-card">
+            <div class="uc-icon">👤</div>
+            <h4>Individuals</h4>
+            <p>Improve productivity by eliminating distractions.</p>
+          </div>
+          <div class="use-case-card">
+            <div class="uc-icon">👨‍👩‍👧</div>
+            <h4>Parents</h4>
+            <p>Protect children from harmful content and excessive screen time.</p>
+          </div>
+          <div class="use-case-card">
+            <div class="uc-icon">🎓</div>
+            <h4>Students</h4>
+            <p>Stay focused during study sessions.</p>
+          </div>
+          <div class="use-case-card">
+            <div class="uc-icon">🏢</div>
+            <h4>Organizations</h4>
+            <p>Control device usage policies for company devices.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Our Vision -->
+      <div class="vision-banner">
+        <h3>Our Vision</h3>
+        <p>We believe technology should <strong>empower productivity, not create distractions</strong>. Regulet aims to become a trusted solution for <strong>smart digital regulation, online safety, and focused living</strong>.</p>
+      </div>
+
+    </div>
+ 
+    <!-- ═══════════════════════ PRIVACY TAB ═══════════════════════ -->
+    <div id="privacy" class="section">
+      <div id="privacyContent"></div>
+    </div>
+ 
+  </div><!-- /.wrap -->
+ 
+  <div class="toast" id="toast"></div>
+ 
+  <footer>&copy; 2026 Regulet. All rights reserved.</footer>
+ 
+  <script>
+    // ════════════════════════════════════════════════════════════════
+    //  PRIVACY POLICY DATA
+    // ════════════════════════════════════════════════════════════════
+    const PRIVACY_POLICY = {
+      meta: {
+        effectiveDate: "01-Mar-2026",
+        appName: "Regulet",
+        companyName: "BNT SOFT PVT LTD"
+      },
+      sections: [
+        {
+          id: 1, title: "Introduction",
+          content: [
+            { type: "paragraph", text: "We are committed to protecting your privacy. This Privacy Policy explains how we collect, use, store, and protect your personal information when you use our mobile application." },
+            { type: "paragraph", text: "By using our application, you agree to the terms outlined in this Privacy Policy." }
+          ]
+        },
+        {
+          id: 2, title: "Information We Collect",
+          subsections: [
+            {
+              title: "2.1 Personal Information",
+              content: [
+                { type: "paragraph", text: "We collect the following personal information when you create an account:" },
+                { type: "list", items: ["Name", "Email Address"] },
+                { type: "paragraph", text: "This information is collected only for registration purpose when voluntarily provided by the user." }
+              ]
+            },
+            {
+              title: "2.2 Usage and Device Information",
+              content: [
+                { type: "paragraph", text: "We may collect limited device-related information necessary for app functionality, such as:" },
+                { type: "list", items: ["App usage statistics (via Usage Access permission)", "App activity required for parental control functionality", "Notification data for monitoring and alerts"] },
+                { type: "paragraph", text: "We do <strong>not</strong> sell, rent, or trade your personal information to third parties." }
+              ]
+            }
+          ]
+        },
+        {
+          id: 3, title: "Permissions We Request and Why",
+          intro: "Our application requires the following permissions to provide core features:",
+          subsections: [
+            {
+              title: "3.1 VPN Permission", purpose: "The VPN permission is used to:",
+              content: [
+                { type: "list", items: ["Block access to specific websites and URLs", "Filter inappropriate or restricted content", "Enable safe browsing features"] },
+                { type: "paragraph", text: "We use Android's local VPN service only to monitor and filter network traffic within your device." },
+                { type: "paragraph", text: "We do <strong>not</strong> collect or store your browsing content on external servers." }
+              ]
+            },
+            {
+              title: "3.2 Notification Access Permission", purpose: "Notification access is used to:",
+              content: [
+                { type: "list", items: ["Monitor app notifications for parental control purposes", "Block or manage notifications from restricted apps", "Provide digital discipline functionality"] },
+                { type: "paragraph", text: "We do not read personal messages unless required for parental control features enabled by the user." }
+              ]
+            },
+            {
+              title: "3.3 Appear on Top (Draw Over Other Apps)", purpose: "This permission allows us to:",
+              content: [
+                { type: "list", items: ["Display a blocking screen when restricted apps or websites are accessed", "Show alerts and restriction messages", "Enforce screen-time limits"] },
+                { type: "paragraph", text: "This permission is strictly used for app-blocking and digital discipline functionality." }
+              ]
+            },
+            {
+              title: "3.4 Usage Access Permission", purpose: "Usage access is required to:",
+              content: [
+                { type: "list", items: ["Monitor app usage time", "Identify which apps are being used", "Enforce screen time limits", "Enable parental control and digital detox features"] },
+                { type: "paragraph", text: "We only access usage statistics necessary to provide these features." }
+              ]
+            }
+          ]
+        },
+        {
+          id: 4, title: "How We Use Your Information",
+          content: [
+            { type: "paragraph", text: "We use collected information to:" },
+            { type: "list", items: ["Create and manage your account", "Provide parental control and app-blocking services", "Improve app performance and user experience", "Send important service-related notifications", "Respond to support inquiries"] },
+            { type: "paragraph", text: "We do not use your personal information for advertising purposes." }
+          ]
+        },
+        {
+          id: 5, title: "Data Storage and Security",
+          content: [
+            { type: "paragraph", text: "We implement appropriate technical and organizational measures to protect your data from:" },
+            { type: "list", items: ["Unauthorized access", "Data loss", "Misuse or disclosure"] },
+            { type: "paragraph", text: "Personal information such as name and email is stored securely and accessed only for legitimate business purposes." }
+          ]
+        },
+        {
+          id: 6, title: "Data Sharing",
+          content: [
+            { type: "paragraph", text: "We do not sell your personal data." },
+            { type: "paragraph", text: "We may share limited information only:" },
+            { type: "list", items: ["If required by law", "To comply with legal obligations", "To protect our legal rights"] }
+          ]
+        },
+        {
+          id: 7, title: "Data Retention",
+          content: [
+            { type: "paragraph", text: "We retain your personal information only as long as necessary to:" },
+            { type: "list", items: ["Provide services", "Comply with legal obligations", "Resolve disputes"] },
+            { type: "paragraph", text: "You may request deletion of your account and associated data at any time." }
+          ]
+        },
+        {
+          id: 8, title: "User Rights",
+          content: [
+            { type: "paragraph", text: "You have the right to:" },
+            { type: "list", items: ["Access your personal information", "Request correction of inaccurate data", "Request deletion of your account", "Withdraw consent for permissions (may affect functionality)"] },
+            { type: "paragraph", text: "To exercise these rights, contact us at: <strong>reguletsupport@bnt-soft.com</strong>" }
+          ]
+        },
+        {
+          id: 9, title: "Children's Privacy",
+          content: [
+            { type: "paragraph", text: "If the app is used for parental control, the parent or guardian is responsible for supervising the child's use of the application." },
+            { type: "paragraph", text: "We do not knowingly collect personal information from children without parental consent." }
+          ]
+        },
+        {
+          id: 10, title: "Changes to This Policy",
+          content: [
+            { type: "paragraph", text: "We may update this Privacy Policy from time to time. Any changes will be reflected with a revised \"Effective Date.\"" }
+          ]
+        }
+      ]
+    };
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  RENDER PRIVACY POLICY
+    // ════════════════════════════════════════════════════════════════
+    function renderPrivacyPolicy() {
+      const container = document.getElementById('privacyContent');
+      const p = PRIVACY_POLICY;
+      let html = `
+        <div class="policy-meta">
+          <table>
+            <tr><td>Effective Date:</td><td>${p.meta.effectiveDate}</td></tr>
+            <tr><td>App Name:</td><td>${p.meta.appName}</td></tr>
+            <tr><td>Company Name:</td><td>${p.meta.companyName}</td></tr>
+          </table>
+        </div>`;
+ 
+      function renderContentItems(items) {
+        return items.map(item =>
+          item.type === 'paragraph'
+            ? `<p>${item.text}</p>`
+            : `<ul>${item.items.map(li => `<li>${li}</li>`).join('')}</ul>`
+        ).join('');
+      }
+ 
+      p.sections.forEach(section => {
+        html += `<div class="policy-block"><h3>${section.id}. ${section.title}</h3>`;
+        if (section.intro)       html += `<p>${section.intro}</p>`;
+        if (section.content)     html += renderContentItems(section.content);
+        if (section.subsections) {
+          section.subsections.forEach(sub => {
+            html += `<h4>${sub.title}</h4>`;
+            if (sub.purpose) html += `<p><strong>Purpose:</strong><br>${sub.purpose}</p>`;
+            html += renderContentItems(sub.content);
+          });
+        }
+        html += `</div>`;
+      });
+ 
+      html += `<div class="policy-note">For privacy-related questions, contact us at
+        <a href="mailto:reguletsupport@bnt-soft.com">reguletsupport@bnt-soft.com</a>.</div>`;
+      container.innerHTML = html;
+    }
+ 
+    renderPrivacyPolicy();
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  TAB QUERY PARAM HANDLER
+    // ════════════════════════════════════════════════════════════════
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+      const tab = params.get('tab');
+      if (tab === 'privacy_policy') {
+        document.getElementById('tabBtnPrivacy').click();
+      } else if (tab === 'about_us') {
+        document.getElementById('tabBtnAbout').click();
+      }
+    })();
+ 
+    // PROD
+     const VITE_API_BASE_URL = "https://regulet.bnt-soft.com/api/bnt-soft/v1";
+ 
+    // DEV
+        // const VITE_API_BASE_URL = "http://172.31.2.14:8082/bnt-soft/v1";
+ 
+    const CONTACT_US_URL = `${VITE_API_BASE_URL}/contact-us`;
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  VALIDATION HELPERS
+    // ════════════════════════════════════════════════════════════════
+    function validateEmail(value) {
+      const v = value.trim();
+      if (!v) return { ok: false, msg: 'Email address is required.' };
+      const parts = v.split('@');
+      if (parts.length !== 2)        return { ok: false, msg: 'Email must contain exactly one "@" symbol.' };
+      const [local, domain] = parts;
+      if (!local)                    return { ok: false, msg: 'Email is missing the part before "@".' };
+      if (!domain)                   return { ok: false, msg: 'Email is missing the domain after "@".' };
+      if (/\s/.test(v))              return { ok: false, msg: 'Email address must not contain spaces.' };
+      if (local.startsWith('.'))     return { ok: false, msg: 'Email local part cannot start with a dot.' };
+      if (local.endsWith('.'))       return { ok: false, msg: 'Email local part cannot end with a dot.' };
+      if (/\.{2,}/.test(local))      return { ok: false, msg: 'Email local part cannot have consecutive dots.' };
+      if (!/^[a-zA-Z0-9._%+\-]+$/.test(local)) return { ok: false, msg: 'Email contains invalid characters before "@".' };
+      const domainParts = domain.split('.');
+      if (domainParts.length < 2)    return { ok: false, msg: 'Email domain must include a TLD (e.g. .com).' };
+      const tld = domainParts[domainParts.length - 1];
+      if (tld.length < 2)            return { ok: false, msg: 'Email TLD must be at least 2 characters.' };
+      if (!/^[a-zA-Z0-9\-\.]+$/.test(domain))  return { ok: false, msg: 'Email domain contains invalid characters.' };
+      if (domain.startsWith('.') || domain.endsWith('.')) return { ok: false, msg: 'Email domain cannot start or end with a dot.' };
+      if (/\.{2,}/.test(domain))     return { ok: false, msg: 'Email domain cannot have consecutive dots.' };
+      return { ok: true, msg: '' };
+    }
+ 
+    function validateName(value, fieldLabel) {
+      const v = value.trim();
+      if (!v)           return { ok: false, msg: `${fieldLabel} is required.` };
+      if (v.length < 2) return { ok: false, msg: `${fieldLabel} must be at least 2 characters.` };
+      if (!/^[a-zA-Z\s'\-]+$/.test(v)) return { ok: false, msg: `${fieldLabel} can only contain letters, spaces, hyphens, or apostrophes.` };
+      return { ok: true, msg: '' };
+    }
+ 
+    function validateMessage(value) {
+      const v = value.trim();
+      if (!v)            return { ok: false, msg: 'Message is required.' };
+      if (v.length < 10) return { ok: false, msg: `Message must be at least 10 characters (${v.length}/10).` };
+      if (!/[a-zA-Z]/.test(v)) return { ok: false, msg: 'Message must contain meaningful text.' };
+      const letterCount = (v.match(/[a-zA-Z]/g) || []).length;
+      if (letterCount < 5) return { ok: false, msg: `Message must contain at least 5 letters (found ${letterCount}).` };
+      return { ok: true, msg: '' };
+    }
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  UI HELPERS
+    // ════════════════════════════════════════════════════════════════
+    function setFieldState(inputId, iconId, errId, errTextId, result) {
+      const input   = document.getElementById(inputId);
+      const icon    = document.getElementById(iconId);
+      const errEl   = document.getElementById(errId);
+      const errText = errTextId ? document.getElementById(errTextId) : null;
+      if (result.ok) {
+        input.classList.remove('error'); input.classList.add('valid');
+        icon.textContent = '✓'; icon.className = 'input-icon show ok';
+        errEl.classList.remove('visible');
+      } else {
+        input.classList.add('error'); input.classList.remove('valid');
+        icon.textContent = '✕'; icon.className = 'input-icon show bad';
+        if (errText) errText.textContent = result.msg;
+        errEl.classList.add('visible');
+      }
+    }
+ 
+    function clearFieldState(inputId, iconId, errId) {
+      document.getElementById(inputId).classList.remove('error', 'valid');
+      const icon = document.getElementById(iconId);
+      icon.textContent = ''; icon.className = 'input-icon';
+      document.getElementById(errId).classList.remove('visible');
+    }
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  LIVE VALIDATION LISTENERS
+    // ════════════════════════════════════════════════════════════════
+    document.getElementById('firstName').addEventListener('blur', function () {
+      if (!this.value.trim()) return clearFieldState('firstName', 'firstNameIcon', 'firstNameErr');
+      setFieldState('firstName', 'firstNameIcon', 'firstNameErr', null, validateName(this.value, 'First name'));
+    });
+    document.getElementById('firstName').addEventListener('input', function () {
+      if (!this.value.trim()) clearFieldState('firstName', 'firstNameIcon', 'firstNameErr');
+    });
+ 
+    document.getElementById('lastName').addEventListener('blur', function () {
+      if (!this.value.trim()) return clearFieldState('lastName', 'lastNameIcon', 'lastNameErr');
+      setFieldState('lastName', 'lastNameIcon', 'lastNameErr', null, validateName(this.value, 'Last name'));
+    });
+    document.getElementById('lastName').addEventListener('input', function () {
+      if (!this.value.trim()) clearFieldState('lastName', 'lastNameIcon', 'lastNameErr');
+    });
+ 
+    document.getElementById('email').addEventListener('blur', function () {
+      if (!this.value.trim()) return clearFieldState('email', 'emailIcon', 'emailErr');
+      setFieldState('email', 'emailIcon', 'emailErr', 'emailErrText', validateEmail(this.value));
+    });
+    document.getElementById('email').addEventListener('input', function () {
+      if (!this.value.trim()) clearFieldState('email', 'emailIcon', 'emailErr');
+      if (validateEmail(this.value).ok) setFieldState('email', 'emailIcon', 'emailErr', 'emailErrText', { ok: true });
+    });
+ 
+    document.getElementById('message').addEventListener('input', function () {
+      const len = this.value.length;
+      const cc  = document.getElementById('charCount');
+      cc.textContent = `${len} / 1000`;
+      cc.className   = 'char-count' + (len >= 1000 ? ' limit' : len >= 800 ? ' warn' : '');
+      const msgErr   = document.getElementById('messageErr');
+      if (!this.value.trim()) {
+        this.classList.remove('error', 'valid');
+        msgErr.classList.remove('visible');
+        return;
+      }
+      const result = validateMessage(this.value);
+      if (result.ok) {
+        this.classList.remove('error'); this.classList.add('valid');
+        msgErr.classList.remove('visible');
+      } else {
+        this.classList.add('error'); this.classList.remove('valid');
+        msgErr.textContent = '⚠ ' + result.msg;
+        msgErr.classList.add('visible');
+      }
+    });
+    document.getElementById('message').addEventListener('blur', function () {
+      if (!this.value.trim()) {
+        this.classList.remove('error', 'valid');
+        document.getElementById('messageErr').classList.remove('visible');
+      }
+    });
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  TAB SWITCHER
+    // ════════════════════════════════════════════════════════════════
+    function switchTab(id, btn) {
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      btn.classList.add('active');
+    }
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  TOAST
+    // ════════════════════════════════════════════════════════════════
+    function showToast(message, type = 'success') {
+      const toast = document.getElementById('toast');
+      toast.textContent = (type === 'success' ? '✓  ' : '✕  ') + message;
+      toast.className   = `toast ${type} show`;
+      setTimeout(() => toast.classList.remove('show'), 4000);
+    }
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  RECAPTCHA CALLBACKS
+    // ════════════════════════════════════════════════════════════════
+    window._captchaToken = '';
+ 
+    window.onCaptchaSuccess = function (token) {
+      window._captchaToken = token;
+      document.getElementById('captchaErr').classList.remove('visible');
+      console.log('[reCAPTCHA] ✅ onCaptchaSuccess fired. Token length:', token.length);
+    };
+ 
+    window.onCaptchaExpired = function () {
+      window._captchaToken = '';
+      const errEl = document.getElementById('captchaErr');
+      errEl.textContent = '⚠ CAPTCHA expired. Please tick the checkbox again.';
+      errEl.classList.add('visible');
+      console.warn('[reCAPTCHA] ⚠ Token expired');
+    };
+ 
+    window.onCaptchaError = function () {
+      window._captchaToken = '';
+      const errEl = document.getElementById('captchaErr');
+      errEl.textContent = '⚠ CAPTCHA error. Please try again.';
+      errEl.classList.add('visible');
+      console.error('[reCAPTCHA] ✕ Widget error');
+    };
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  FIELD VALIDATION (called from handleSubmit)
+    // ════════════════════════════════════════════════════════════════
+    function validateFields() {
+      let valid = true;
+ 
+      const fnResult = validateName(document.getElementById('firstName').value, 'First name');
+      setFieldState('firstName', 'firstNameIcon', 'firstNameErr', null, fnResult);
+      if (!fnResult.ok) valid = false;
+ 
+      const lnResult = validateName(document.getElementById('lastName').value, 'Last name');
+      setFieldState('lastName', 'lastNameIcon', 'lastNameErr', null, lnResult);
+      if (!lnResult.ok) valid = false;
+ 
+      const emResult = validateEmail(document.getElementById('email').value);
+      setFieldState('email', 'emailIcon', 'emailErr', 'emailErrText', emResult);
+      if (!emResult.ok) valid = false;
+ 
+      const msgResult = validateMessage(document.getElementById('message').value);
+      const msgEl     = document.getElementById('message');
+      const msgErr    = document.getElementById('messageErr');
+      if (msgResult.ok) {
+        msgEl.classList.remove('error'); msgEl.classList.add('valid');
+        msgErr.classList.remove('visible');
+      } else {
+        msgEl.classList.add('error'); msgEl.classList.remove('valid');
+        msgErr.textContent = '⚠ ' + msgResult.msg;
+        msgErr.classList.add('visible');
+        valid = false;
+      }
+ 
+      if (!valid) {
+        const firstErr = document.querySelector('.error');
+        if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return valid;
+    }
+ 
+    // ════════════════════════════════════════════════════════════════
+    //  SUBMIT HANDLER
+    // ════════════════════════════════════════════════════════════════
+    async function handleSubmit() {
+ 
+      const fieldsOk   = validateFields();
+      const captchaErr = document.getElementById('captchaErr');
+ 
+      let captchaToken = '';
+      if (typeof grecaptcha !== 'undefined') {
+        try { captchaToken = grecaptcha.getResponse() || ''; } catch (e) { /* widget not ready */ }
+      }
+      if (!captchaToken) captchaToken = window._captchaToken || '';
+ 
+      console.log('[Submit] grecaptcha available :', typeof grecaptcha !== 'undefined');
+      console.log('[Submit] getResponse() length :', captchaToken.length);
+      console.log('[Submit] _captchaToken length :', (window._captchaToken || '').length);
+      console.log('[Submit] token to send        :', captchaToken ? captchaToken.substring(0, 20) + '…' : '(EMPTY — token missing!)');
+ 
+      if (!captchaToken) {
+        captchaErr.textContent = '⚠ Please complete the CAPTCHA verification.';
+        captchaErr.classList.add('visible');
+        if (fieldsOk) captchaErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        captchaErr.classList.remove('visible');
+      }
+ 
+      if (!fieldsOk || !captchaToken) return;
+ 
+      const btn = document.getElementById('submitBtn');
+      btn.classList.add('loading');
+      btn.disabled = true;
+ 
+      const payload = {
+        firstName : document.getElementById('firstName').value.trim(),
+        lastName  : document.getElementById('lastName').value.trim(),
+        email     : document.getElementById('email').value.trim().toLowerCase(),
+        message   : document.getElementById('message').value.trim(),
+      };
+ 
+      console.log('[Submit] POST →', CONTACT_US_URL);
+      console.log('[Submit] payload :', payload);
+      console.log('[Submit] captcha-token header (first 20 chars):', captchaToken.substring(0, 20) + '…');
+ 
+      try {
+        const response = await fetch(CONTACT_US_URL, {
+          method  : 'POST',
+          headers : {
+            'Content-Type' : 'application/json',
+            'captcha-token': captchaToken,
+          },
+          body: JSON.stringify(payload),
+        });
+ 
+        console.log('[Submit] response status :', response.status);
+        const data = await response.json();
+        console.log('[Submit] response body   :', data);
+ 
+        if (response.ok && data.statusCode === 200) {
+          showToast(data.message || 'Your message has been sent successfully.', 'success');
+ 
+          ['firstName', 'lastName', 'email', 'message'].forEach(id => {
+            const el = document.getElementById(id);
+            el.value = '';
+            el.classList.remove('error', 'valid');
+          });
+          ['firstNameIcon', 'lastNameIcon', 'emailIcon'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) { el.textContent = ''; el.className = 'input-icon'; }
+          });
+          document.getElementById('charCount').textContent = '0 / 1000';
+          document.getElementById('charCount').className   = 'char-count';
+ 
+          window._captchaToken = '';
+          if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+ 
+        } else {
+          showToast(data.message || 'Something went wrong. Please try again.', 'error');
+          window._captchaToken = '';
+          if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+        }
+ 
+      } catch (err) {
+        console.error('[Submit] fetch error :', err);
+        showToast('Network error. Please check your connection and try again.', 'error');
+        window._captchaToken = '';
+        if (typeof grecaptcha !== 'undefined') grecaptcha.reset();
+ 
+      } finally {
+        btn.classList.remove('loading');
+        btn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>
