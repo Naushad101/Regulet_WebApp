@@ -53,17 +53,17 @@ export default defineConfig({
   server: {
     proxy: {
       '/bnt-soft': {
-        target: 'http://192.168.137.162:8082',
+        target: 'http://172.31.2.14:8082',
         changeOrigin: true,
         secure: false
       },
       '/payment': {
-        target: 'http://192.168.137.162:8082',
+        target: 'http://172.31.2.14:8082',
         changeOrigin: true,
         secure: false
       },
       "/sales-team": {
-        target: "http://192.168.137.162:8082",
+        target: "http://172.31.2.14:8082",
         changeOrigin: true,
         secure: false,
       }
