@@ -3,6 +3,7 @@ import {
   Dialog, DialogTitle, DialogContent, DialogActions,
   Button, Box, Typography, Divider, CircularProgress, TextField,
 } from "@mui/material";
+import * as XLSX from "xlsx";
 import { VITE_API_BASE_URL } from "../config";
 
 const BULK_UPLOAD_URL = `${VITE_API_BASE_URL}/upload-user-subscriptions`;
@@ -20,7 +21,6 @@ const TEMPLATE_SAMPLE_ROW = [
 
 // ── File validation ───────────────────────────────────────────
 async function validateExcelFile(file) {
-  const XLSX = await import("https://cdn.sheetjs.com/xlsx-0.20.1/package/xlsx.mjs");
   const buffer = await file.arrayBuffer();
   const wb = XLSX.read(buffer, { type: "array" });
 
@@ -77,8 +77,7 @@ async function validateExcelFile(file) {
 }
 
 // ── Template download ─────────────────────────────────────────
-async function downloadTemplate() {
-  const XLSX = await import("https://cdn.sheetjs.com/xlsx-0.20.1/package/xlsx.mjs");
+function downloadTemplate() {
   const ws   = XLSX.utils.aoa_to_sheet([TEMPLATE_HEADERS, TEMPLATE_SAMPLE_ROW]);
   ws["!cols"] = [20, 28, 14, 14, 12, 22, 28].map((wch) => ({ wch }));
   const wb   = XLSX.utils.book_new();
@@ -223,7 +222,6 @@ function ModeCard({ icon, title, description, selected, onClick, accentColor }) 
         position: "relative",
       }}
     >
-      {/* Selected check badge */}
       {selected && (
         <Box sx={{
           position: "absolute", top: 8, right: 8,
@@ -249,14 +247,12 @@ function GroupModeStep({ mode, onModeChange, groupName, onGroupNameChange, group
   return (
     <>
       <DialogContent sx={{ px: 3, py: 2.5 }}>
-        {/* Info hint */}
         <Box sx={{ p: 1.5, mb: 2.5, bgcolor: "#eff6ff", border: "0.5px solid #bfdbfe", borderRadius: 2 }}>
           <Typography fontSize="11.5px" color="#1e40af" lineHeight={1.65}>
             Choose how uploaded users should be organised. This can help with reporting and filtering later.
           </Typography>
         </Box>
 
-        {/* Mode cards */}
         <Box sx={{ display: "flex", gap: 1.5, mb: 2.5 }}>
           <ModeCard
             icon={<UsersIcon />}
@@ -276,7 +272,6 @@ function GroupModeStep({ mode, onModeChange, groupName, onGroupNameChange, group
           />
         </Box>
 
-        {/* Group name input — only shown when group mode is selected */}
         {mode === "group" && (
           <Box sx={{
             p: 2, borderRadius: 2.5,
@@ -345,9 +340,9 @@ function FileUploadStep({
   onDownloadTemplate, onBack,
   inputRef, mode, groupName,
 }) {
-  const isSuccess   = feedback?.type === "success";
+  const isSuccess    = feedback?.type === "success";
   const hasValErrors = validationErrors.length > 0;
-  const canUpload   = !!file && !validating && !hasValErrors && !uploading && !isSuccess;
+  const canUpload    = !!file && !validating && !hasValErrors && !uploading && !isSuccess;
 
   const fmtSize = (bytes) =>
     bytes > 1024 * 1024 ? `${(bytes / 1024 / 1024).toFixed(1)} MB` : `${Math.round(bytes / 1024)} KB`;
@@ -481,7 +476,7 @@ function FileUploadStep({
       <Divider />
 
       <DialogActions sx={{ px: 3, py: 1.75, justifyContent: "space-between" }}>
-        {/* Left: template + back */}
+        {/* Left: back + template */}
         <Box sx={{ display: "flex", gap: 1, alignItems: "center" }}>
           <Button
             onClick={onBack}
@@ -527,30 +522,30 @@ function FileUploadStep({
 
 // ── Main Component ────────────────────────────────────────────
 export default function BulkUploadModal({ open, onClose, agentEmail }) {
-  // ── step: "mode" | "upload"
-  const [step, setStep]             = useState("mode");
+  // step: "mode" | "upload"
+  const [step, setStep]                       = useState("mode");
 
-  // ── mode step state
-  const [mode, setMode]             = useState(null);        // "group" | "individual"
-  const [groupName, setGroupName]   = useState("");
-  const [groupNameError, setGroupNameError] = useState("");
+  // mode step state
+  const [mode, setMode]                       = useState(null);   // "group" | "individual"
+  const [groupName, setGroupName]             = useState("");
+  const [groupNameError, setGroupNameError]   = useState("");
 
-  // ── upload step state
-  const [file, setFile]             = useState(null);
-  const [dragging, setDragging]     = useState(false);
-  const [validating, setValidating] = useState(false);
+  // upload step state
+  const [file, setFile]                       = useState(null);
+  const [dragging, setDragging]               = useState(false);
+  const [validating, setValidating]           = useState(false);
   const [validationErrors, setValidationErrors] = useState([]);
-  const [uploading, setUploading]   = useState(false);
-  const [templateDone, setTemplateDone] = useState(false);
-  const [downloading, setDownloading]   = useState(false);
-  const [feedback, setFeedback]     = useState(null);
+  const [uploading, setUploading]             = useState(false);
+  const [templateDone, setTemplateDone]       = useState(false);
+  const [downloading, setDownloading]         = useState(false);
+  const [feedback, setFeedback]               = useState(null);
 
   const inputRef = useRef(null);
 
-  // ── group name validation ─────────────────────────────────
+  // ── Group name validation ─────────────────────────────────
   const validateGroupName = (v) => {
     const s = v.trim();
-    if (!s)          return "Group name is required.";
+    if (!s)           return "Group name is required.";
     if (s.length < 2) return "Must be at least 2 characters.";
     if (s.length > 100) return "Max 100 characters.";
     return "";
@@ -561,7 +556,7 @@ export default function BulkUploadModal({ open, onClose, agentEmail }) {
     setGroupNameError(validateGroupName(v));
   };
 
-  // ── Auto-close 1s after successful upload
+  // ── Auto-close 1s after successful upload ─────────────────
   useEffect(() => {
     if (feedback?.type !== "success") return;
     const t = setTimeout(handleClose, 1000);
@@ -579,7 +574,6 @@ export default function BulkUploadModal({ open, onClose, agentEmail }) {
   };
 
   const handleClose = () => {
-    // full reset
     setStep("mode");
     setMode(null);
     setGroupName("");
@@ -644,7 +638,6 @@ export default function BulkUploadModal({ open, onClose, agentEmail }) {
 
       const params = new URLSearchParams();
       if (agentEmail && agentEmail !== "—") params.set("agentMail", agentEmail);
-      // groupName is mandatory in the backend signature — send empty string for individual
       params.set("groupName", mode === "group" ? groupName.trim() : "");
 
       const finalUrl = `${BULK_UPLOAD_URL}?${params.toString()}`;
@@ -663,11 +656,17 @@ export default function BulkUploadModal({ open, onClose, agentEmail }) {
     }
   };
 
-  const handleDownloadTemplate = async () => {
+  // ── Template download ─────────────────────────────────────
+  const handleDownloadTemplate = () => {
     setDownloading(true);
-    try { await downloadTemplate(); setTemplateDone(true); }
-    catch { setFeedback({ type: "error", title: "Download failed", body: "Could not generate the template. Please try again." }); }
-    finally { setDownloading(false); }
+    try {
+      downloadTemplate();
+      setTemplateDone(true);
+    } catch {
+      setFeedback({ type: "error", title: "Download failed", body: "Could not generate the template. Please try again." });
+    } finally {
+      setDownloading(false);
+    }
   };
 
   // ── Header title & subtitle per step ─────────────────────
